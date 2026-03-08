@@ -9,14 +9,14 @@ import { fetchSearchHistory } from "./utils/supabase";
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [claims, setClaims] = useState(null);
+  const [claims, setClaims] = useState<any>(null);
 
   // Check URL params on initial render
   const params = new URLSearchParams(window.location.search);
   const hasTokenHash = params.get("token_hash");
 
   const [verifying, setVerifying] = useState(!!hasTokenHash);
-  const [authError, setAuthError] = useState(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -33,7 +33,7 @@ export default function App() {
       supabase.auth
         .verifyOtp({
           token_hash,
-          type: type || "email",
+          type: (type as any) || "email",
         })
         .then(({ error }) => {
           if (error) {
@@ -48,15 +48,16 @@ export default function App() {
     }
 
     // Check for existing session using getClaims
-    supabase.auth.getClaims().then(({ data: { claims } }) => {
-      setClaims(claims);
+    (supabase.auth as any).getClaims().then(({ data }: any) => {
+      if (data) setClaims(data.claims);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      supabase.auth.getClaims().then(({ data: { claims } }) => {
+      (supabase.auth as any).getClaims().then(({ data }: any) => {
+        const claims = data?.claims;
         setClaims(claims);
         // Load search history when user logs in
         if (claims) {
@@ -69,7 +70,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = async (event) => {
+  const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
@@ -79,7 +80,7 @@ export default function App() {
       },
     });
     if (error) {
-      alert(error.error_description || error.message);
+      alert(error.message);
     } else {
       alert("Check your email for the login link!");
     }

@@ -52,7 +52,6 @@ export async function analyzeFood(foodItem: string) {
 
   const {
     data: { user },
-    error, 
   } = await supabase.auth.getUser();
 
   const result = await chain.invoke({
@@ -61,7 +60,7 @@ export async function analyzeFood(foodItem: string) {
   });
 
   // Supabase insert (RLS will ensure the row belongs to the current user)
-  await supabase.from("searches").insert({
+  const { data, error: insertError } = await supabase.from("searches").insert({
     id: crypto.randomUUID(),
     user_id: user?.id ?? null,
     food_item: result.item,
@@ -69,15 +68,23 @@ export async function analyzeFood(foodItem: string) {
     notes: result.notes,
     healthier_alternatives: result.healthier_alternatives,
     created_at: new Date().toISOString(),
-  });
+  }).select().single();
 
-  return result;
+  if (insertError) throw insertError;
+
+  return {
+    id: data.id,
+    item: data.food_item,
+    calories: data.calories,
+    notes: data.notes,
+    healthier_alternatives: data.healthier_alternatives,
+    created_at: data.created_at
+  };
 }
 
 export async function fetchSearchHistory() {
   const {
     data: { user },
-    err,
   } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
@@ -89,7 +96,6 @@ export async function fetchSearchHistory() {
 
   if (data && data.length) {
     const { addSearch, clearSearches } = useSearchStore.getState();
-    console.log("All Data", data)
 
     clearSearches();
     data.forEach((search: any) =>
@@ -114,7 +120,6 @@ export async function deleteSearch(search_id: string) {
 export async function deleteAllSearch() {
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
 
   if (user) {

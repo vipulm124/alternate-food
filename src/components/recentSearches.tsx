@@ -13,6 +13,8 @@ import { useState } from "react";
 import { deleteSearch, deleteAllSearch } from "../utils/supabase";
 import { fetchSearchHistory } from "../utils/supabase";
 
+import type { ResultData } from "../types/ResultDataType";
+
 function RecentSearches() {
   const searches = useSearchStore((state: any) => state.searches);
   const { clearSearches } = useSearchStore.getState();
@@ -76,8 +78,8 @@ function RecentSearches() {
         </div>
       </div>
       <div className="space-y-4">
-        {searches.map((search, index) => (
-          
+        {searches.map((search: ResultData, index: number) => (
+
           <div
             className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
             key={index}

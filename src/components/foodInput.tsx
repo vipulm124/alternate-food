@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
 import { Search, Loader2 } from "lucide-react";
-import type { FoodInputProps } from "../types/foodInputType";
+import type { FoodInputProps } from "../types/FoodInputType";
 import { analyzeFood } from "../utils/supabase";
 import { fetchSearchHistory } from "../utils/supabase";
 

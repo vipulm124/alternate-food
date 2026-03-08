@@ -2,7 +2,7 @@
 
 :root {
   /* background-color: rgb(237,253,246); */
-  background-color: rgb(209, 250, 232);
+  background-color: #f9fafb;
    
 }
 
@@ -10,8 +10,5 @@
 
 body {
   margin: 0;
-  display: flex;
-  min-width: 320px;
-  min-height: 100vh;
 }
 

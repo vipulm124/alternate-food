@@ -7,7 +7,6 @@ function ResultCard({ data }: ResultCardProps) {
   return (
     <div className="w-full bg-white p-5 sm:p-8 rounded-3xl mt-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100">
       <div className="flex flex-col md:flex-row gap-6 sm:gap-8">
-        {/* Left Column: Original Item */}
         <div className="flex-1 bg-gray-50 p-5 sm:p-6 rounded-2xl border border-gray-100">
           <h3 className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
             You Searched For

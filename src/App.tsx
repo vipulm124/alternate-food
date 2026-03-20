@@ -5,11 +5,14 @@ import { useState, useEffect } from "react";
 import supabase from "./utils/supabase";
 import RecentSearches from "./components/recentSearches";
 import { fetchSearchHistory } from "./utils/supabase";
+import { post } from "./utils/restCalls";
 
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [claims, setClaims] = useState<any>(null);
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   // Check URL params on initial render
   const params = new URLSearchParams(window.location.search);
@@ -66,23 +69,21 @@ export default function App() {
       });
     });
 
-    // getSearchHistory();
     return () => subscription.unsubscribe();
   }, []);
+
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    if (error) {
-      alert(error.message);
-    } else {
+    try {
+      await post(`${backendUrl}/login`, {
+        email: email,
+      });
       alert("Check your email for the login link!");
+    } catch (e) {
+      alert("Error sending login link");
+      console.error(e);
     }
     setLoading(false);
   };
@@ -148,7 +149,7 @@ export default function App() {
           <h1 className="text-lg md:text-xl font-semibold ml-4">Welcome: </h1>
           <p className="text-lg ml-4">{(claims as any)?.email}</p>
           <button
-            className="ml-14 px-4 py-1 bg-black text-white text-sm rounded-md hover:bg-green-700"
+            className="ml-14 px-4 py-1 bg-black text-white text-sm rounded-md hover:bg-green-700 hover:cursor-pointer"
             onClick={handleLogout}
           >
             Sign Out
@@ -164,9 +165,7 @@ export default function App() {
     );
   }
 
-  // Show login form
   return (
-    // <InputContainer/>
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full mx-auto space-y-7 bg-white p-12 rounded-3xl shadow text-center">
         <h1 className="text-2xl md:text-3xl font-semibold">
@@ -185,7 +184,7 @@ export default function App() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none hover:cursor-pointer"
             disabled={loading}
           >
             {loading ? <span>Loading</span> : <span>Send magic link</span>}

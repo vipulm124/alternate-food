@@ -5,6 +5,7 @@ import type { FoodInputProps } from "../types/FoodInputType";
 import { analyzeFood } from "../utils/supabase";
 import { fetchSearchHistory } from "../utils/supabase";
 
+
 function FoodInput({ onResult, onError }: FoodInputProps) {
   const [food, setFood] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -18,10 +19,8 @@ function FoodInput({ onResult, onError }: FoodInputProps) {
     try {
       const modelResponse = await analyzeFood(food);
       await fetchSearchHistory();
-
       onResult(modelResponse);
     } catch (err: unknown) {
-      console.error("Lookup error:", err);
       onError(err instanceof Error ? err.message : "Unexpected error");
     } finally {
       setIsProcessing(false);

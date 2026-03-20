@@ -1,5 +1,6 @@
 // src/utils/supabase.ts
 import { createClient } from "@supabase/supabase-js";
+import type { ResultData } from "../types/ResultDataType";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
@@ -15,18 +16,24 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 import useSearchStore from "../store/searchStore";
 import { get } from "./restCalls";
 
-export async function analyzeFood(foodItem: string) {
+export async function analyzeFood(foodItem: string): Promise<ResultData | null> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   try {
-    const result = await get(
+    interface AnalyzeResponse {
+      is_error?: boolean;
+      calories: string;
+      notes: string;
+      healthier_alternatives: string[];
+    }
+    const result = await get<AnalyzeResponse>(
       `${backendUrl}/analyze?food_item=${encodeURIComponent(foodItem)}`,
     );
     if (result.is_error == true) {
       alert("Not a valid food item.");
-      return;
+      return null;
     }
 
     const { data, error: insertError } = await supabase
@@ -58,16 +65,6 @@ export async function analyzeFood(foodItem: string) {
     alert("some error");
   }
 
-  // if (insertError) throw insertError;
-
-  // return {
-  //   id: data.id,
-  //   item: data.food_item,
-  //   calories: data.calories,
-  //   notes: data.notes,
-  //   healthier_alternatives: data.healthier_alternatives,
-  //   created_at: data.created_at
-  // };
   return null;
 }
 
